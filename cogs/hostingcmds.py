@@ -148,38 +148,60 @@ class HostCmds(commands.Cog):
     async def host(self, interaction : Interaction, *, link):
         role = nextcord.utils.get(interaction.guild.roles, name="GVRSP │ Staff Team")
         devrole = nextcord.utils.get(interaction.guild.roles, name="GVSRP | Bot Developer")
+        activeSession = atb.checkSession(interaction.user.id)
+        global hostid
+        hostid = interaction.user.id
+        global hostingChannel
+        hostingChannel = self.client.get_channel(847882628744478730)
+        global eaChannel
+        eaChannel = self.client.get_channel(878628825741807656)
+        global initLink
+        initLink = link
         if role in interaction.user.roles or devrole in interaction.user.roles:
-            global hostid
-            hostid = interaction.user.id
-            global hostingChannel
-            hostingChannel = self.client.get_channel(847882628744478730)
-            global eaChannel
-            eaChannel = self.client.get_channel(878628825741807656)
-            global initLink
-            initLink = link
+            if activeSession == False:
+                StartSessionB = Button(label="Start Session", style=ButtonStyle.blurple)
+                EASessionB = Button(label="Open Early Access", style=ButtonStyle.gray)
+                ReleaseSessionB = Button(label="Release Session", style=ButtonStyle.green)
+                EndSessionB = Button(label="End Session", style=ButtonStyle.red)
 
-            StartSessionB = Button(label="Start Session", style=ButtonStyle.blurple)
-            EASessionB = Button(label="Open Early Access", style=ButtonStyle.gray)
-            ReleaseSessionB = Button(label="Release Session", style=ButtonStyle.green)
-            EndSessionB = Button(label="End Session", style=ButtonStyle.red)
+                StartSessionB.callback = start
+                EASessionB.callback = earlyaccess
+                ReleaseSessionB.callback = releasesession  
+                EndSessionB.callback = endsession      
 
-            StartSessionB.callback = start
-            EASessionB.callback = earlyaccess
-            ReleaseSessionB.callback = releasesession  
-            EndSessionB.callback = endsession      
+                panelView = View()
+                panelView.add_item(StartSessionB)
+                panelView.add_item(EASessionB)
+                panelView.add_item(ReleaseSessionB)
+                panelView.add_item(EndSessionB)
 
-            panelView = View()
-            panelView.add_item(StartSessionB)
-            panelView.add_item(EASessionB)
-            panelView.add_item(ReleaseSessionB)
-            panelView.add_item(EndSessionB)
+                sendEmbed = nextcord.Embed(title="**Hosting Panel**", description=f'Hello {interaction.user.mention}...')
+                sendEmbed.add_field(name='Welcome to the Hosting Panel!', value='Please select an option below!', inline=False)
+                sendEmbed.set_thumbnail(url='https://cdn.discordapp.com/attachments/957635340577955882/957635414439628901/GV_LOGO.PNG')
 
-            sendEmbed = nextcord.Embed(title="**Hosting Panel**", description=f'Hello {interaction.user.mention}...')
-            sendEmbed.add_field(name='Welcome to the Hosting Panel!', value='Please select an option below!', inline=False)
-            sendEmbed.set_thumbnail(url='https://cdn.discordapp.com/attachments/957635340577955882/957635414439628901/GV_LOGO.PNG')
+                await interaction.response.send_message('The panel has been sent to your DMs!', ephemeral=True)
+                await interaction.user.send(embed=sendEmbed, view=panelView)
+            elif activeSession == True:
+                EASessionB = Button(label="Open Early Access", style=ButtonStyle.gray)
+                ReleaseSessionB = Button(label="Release Session", style=ButtonStyle.green)
+                EndSessionB = Button(label="End Session", style=ButtonStyle.red)
 
-            await interaction.response.send_message('The panel has been sent to your DMs!', ephemeral=True)
-            await interaction.user.send(embed=sendEmbed, view=panelView)
+                EASessionB.callback = earlyaccess
+                ReleaseSessionB.callback = releasesession  
+                EndSessionB.callback = endsession      
+
+                panelView = View()
+                panelView.add_item(EASessionB)
+                panelView.add_item(ReleaseSessionB)
+                panelView.add_item(EndSessionB)
+
+                sendEmbed = nextcord.Embed(title="**Hosting Panel**", description=f'Hello {interaction.user.mention}...')
+                sendEmbed.add_field(name='Welcome to the Hosting Panel!', value='Please select an option below!', inline=False)
+                sendEmbed.set_thumbnail(url='https://cdn.discordapp.com/attachments/957635340577955882/957635414439628901/GV_LOGO.PNG')
+
+                await interaction.response.send_message('The panel has been sent to your DMs!', ephemeral=True)
+                await interaction.user.send(embed=sendEmbed, view=panelView)
+
         else:
             await interaction.response.send_message('You do not have the permissions to do this.', ephemeral=True)
 
